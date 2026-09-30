@@ -1,0 +1,30 @@
+const { test, after } = require('node:test');
+const assert = require('node:assert/strict');
+const fs = require('node:fs/promises');
+const os = require('node:os');
+const path = require('node:path');
+const { createWorkspaceTools } = require('../workspace-tools');
+
+let temporary;
+after(async () => { if (temporary) await fs.rm(temporary, { recursive: true, force: true }); });
+test('workspace tools confine reads, globs, and searches including symlinks', async () => {
+  temporary = await fs.mkdtemp(path.join(os.tmpdir(), 'workspace-tools-'));
+  const root = path.join(temporary, 'root');
+  const outside = path.join(temporary, 'outside');
+  await fs.mkdir(root); await fs.mkdir(outside);
+  await fs.writeFile(path.join(root, 'app.js'), 'const answer = 42;\n// next line');
+  await fs.writeFile(path.join(outside, 'secret.js'), 'private secret');
+  await fs.symlink(outside, path.join(root, 'escape'));
+  await fs.symlink(root, path.join(root, 'cycle'));
+  const execute = createWorkspaceTools([root]);
+  assert.match(await execute('Read', { file_path: 'app.js', offset: 2, limit: 1 }), /^2: \/\/ next line$/);
+  assert.equal(await execute('Glob', { pattern: '**/*.js' }), await fs.realpath(path.join(root, 'app.js')));
+  assert.match(await execute('Grep', { pattern: 'answer' }), /app.js:1: const answer = 42;/);
+  assert.equal(await execute('Grep', { pattern: 'secret' }), '');
+  await assert.rejects(execute('Read', { file_path: '../outside/secret.js' }), /outside/);
+  await assert.rejects(execute('Read', { file_path: 'escape/secret.js' }), /outside/);
+  await assert.rejects(execute('Glob', { path: outside }), /outside/);
+  await assert.rejects(execute('Grep', { path: outside, pattern: 'secret' }), /outside/);
+  await assert.rejects(execute('Write', { file_path: 'app.js' }), /Unknown/);
+  assert.equal(await fs.readFile(path.join(root, 'app.js'), 'utf8'), 'const answer = 42;\n// next line');
+});
