@@ -62,7 +62,7 @@ async function hostFixture(t, extra = {}) {
     }
     return messages;
   }
-  return { dir, calls, send, waitFor };
+  return { dir, calls, send, waitFor, process: host };
 }
 function request(text, fields = {}) { return { type: 'ASK_HOST_START', requestId: randomUUID(), sessionId: randomUUID(), text, paths: [], ...fields }; }
 
@@ -125,4 +125,17 @@ test('missing workspace tools stop investigations instead of returning fabricate
   assert.equal(messages[0].type, 'ASK_HOST_ERROR');
   assert.match(messages[0].error, /read-only workspace tools/);
   assert.ok(!messages.some((message) => message.type === 'ASK_HOST_COMPLETE'));
+});
+
+test('closing Chrome output during a response shuts down without an EPIPE crash', { timeout: 5000 }, async (t) => {
+  const host = await hostFixture(t);
+  let stderr = '';
+  host.process.stderr.on('data', (chunk) => { stderr += chunk.toString(); });
+  const closed = once(host.process, 'close');
+  host.process.stdout.destroy();
+  host.send(request('mock:disconnected'));
+  const [code] = await closed;
+  assert.equal(code, 0, stderr);
+  assert.equal(stderr, '');
+  assert.match(await fs.readFile(path.join(host.dir, 'host.log'), 'utf8'), /Native output closed: EPIPE/);
 });

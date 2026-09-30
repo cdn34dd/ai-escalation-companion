@@ -34,6 +34,14 @@ function log(message) {
   catch { /* Logging must never break native messaging. */ }
 }
 
+log(`Native host started (pid ${process.pid}, Node ${process.version}, ${__filename})`);
+process.on('exit', (code) => log(`Native host exited (code ${code})`));
+process.stdout.on('error', (error) => {
+  log(`Native output closed: ${error.code || error.message}`);
+  for (const child of activeJobs.values()) child.kill();
+  process.exit(error.code === 'EPIPE' ? 0 : 1);
+});
+
 function sendMessage(message) {
   let payload = Buffer.from(JSON.stringify(message));
   if (payload.length > HOST_LIMIT) {
@@ -218,4 +226,7 @@ process.stdin.on('data', (chunk) => {
     }
   }
 });
-process.stdin.on('end', () => { for (const child of activeJobs.values()) child.kill(); });
+process.stdin.on('end', () => {
+  log('Chrome closed native input');
+  for (const child of activeJobs.values()) child.kill();
+});
