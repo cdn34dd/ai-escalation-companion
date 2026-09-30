@@ -1,0 +1,14 @@
+# Keep documentation in the root README; retain other Markdown files locally.
+*.md
+!/README.md
+
+# Dependencies, generated bundles, caches, and local configuration.
+node_modules/
+dist/
+dist-ssr/
+*.tsbuildinfo
+.env
+.env.*
+!.env.example
+*.log
+.DS_Store
