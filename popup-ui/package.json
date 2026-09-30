@@ -1,0 +1,51 @@
+{
+  "name": "popup-ui",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "dev:watch": "npm run dev:popup & npm run dev:content",
+    "dev:popup": "vite build --watch",
+    "dev:content": "vite build --config vite.content.config.ts --watch",
+    "build": "tsc -b && vite build && vite build --config vite.content.config.ts",
+    "lint": "eslint .",
+    "preview": "vite preview",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "dexie": "^4.2.1",
+    "dompurify": "^3.4.16",
+    "lucide-react": "^0.555.0",
+    "marked": "^17.0.1",
+    "marked-highlight": "^2.2.3",
+    "prismjs": "^1.30.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.1",
+    "@testing-library/dom": "^10.4.2",
+    "@testing-library/react": "^16.3.3",
+    "@types/chrome": "^0.1.31",
+    "@types/node": "^24.10.1",
+    "@types/prismjs": "^1.26.6",
+    "@types/react": "^19.2.5",
+    "@types/react-dom": "^19.2.3",
+    "eslint": "^9.39.1",
+    "eslint-plugin-react-hooks": "^7.0.1",
+    "eslint-plugin-react-refresh": "^0.4.24",
+    "fake-indexeddb": "^6.2.5",
+    "globals": "^16.5.0",
+    "jsdom": "26.1.0",
+    "typescript": "~5.9.3",
+    "typescript-eslint": "^8.46.4",
+    "vite": "^7.2.4",
+    "vitest": "^5.0.3",
+    "@vitejs/plugin-react": "^5.1.1"
+  },
+  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e",
+  "engines": {
+    "node": ">=24.11.1"
+  }
+}
