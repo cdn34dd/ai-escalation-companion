@@ -1,0 +1,78 @@
+import type { ToolUsageEntry } from "../db/schema";
+
+export const MessageRecipients = {
+  POPUP: "POPUP",
+  SERVICE_WORKER: "SERVICE_WORKER",
+  CONTENT_SCRIPT: "CONTENT_SCRIPT",
+} as const;
+export type MessageRecipients = (typeof MessageRecipients)[keyof typeof MessageRecipients];
+
+export const MessageTypes = {
+  PAGE_CONTENT_CHANGED: "PAGE_CONTENT_CHANGED",
+  EXTRACTION_START: "EXTRACTION_START",
+  EXTRACTION_COMPLETE: "EXTRACTION_COMPLETE",
+  EXTRACTION_ERROR: "EXTRACTION_ERROR",
+
+  SUMMARIZE_CONTENT_START: "SUMMARIZE_CONTENT_START",
+  SUMMARIZE_CONTENT_COMPLETE: "SUMMARIZE_CONTENT_COMPLETE",
+  SUMMARIZE_CONTENT_ERROR: "SUMMARIZE_CONTENT_ERROR",
+
+  INVESTIGATION_START: "INVESTIGATION_START",
+  INVESTIGATION_STREAM: "INVESTIGATION_STREAM",
+  INVESTIGATION_PROGRESS: "INVESTIGATION_PROGRESS",
+  INVESTIGATION_CONTENT_START: "INVESTIGATION_CONTENT_START",
+  INVESTIGATION_COMPLETE: "INVESTIGATION_COMPLETE",
+  INVESTIGATION_ERROR: "INVESTIGATION_ERROR",
+
+  SELECT_PATH_START: "SELECT_PATH_START",
+  SELECT_PATH_COMPLETE: "SELECT_PATH_COMPLETE",
+  SELECT_PATH_ERROR: "SELECT_PATH_ERROR",
+
+  REQUEST_STATE_START: "REQUEST_STATE_START",
+
+  // Database Actions
+  DB_ACTION_START: "DB_ACTION_START",
+  DB_ACTION_COMPLETE: "DB_ACTION_COMPLETE",
+  DB_ACTION_ERROR: "DB_ACTION_ERROR",
+
+  // Error Messages
+  INVALID_PAGE: "INVALID_PAGE",
+} as const;
+export type MessageTypes = (typeof MessageTypes)[keyof typeof MessageTypes];
+
+export const HostMessageTypes = {
+  SUMMARIZE_HOST_START: "SUMMARIZE_HOST_START",
+  SUMMARIZE_HOST_COMPLETE: "SUMMARIZE_HOST_COMPLETE",
+  SUMMARIZE_HOST_ERROR: "SUMMARIZE_HOST_ERROR",
+
+  ASK_HOST_START: "ASK_HOST_START",
+  ASK_HOST_STREAM: "ASK_HOST_STREAM",
+  ASK_HOST_PROGRESS: "ASK_HOST_PROGRESS",
+  ASK_HOST_CONTENT_START: "ASK_HOST_CONTENT_START",
+  ASK_HOST_COMPLETE: "ASK_HOST_COMPLETE",
+  ASK_HOST_ERROR: "ASK_HOST_ERROR",
+
+  SELECT_HOST_PATH_START: "SELECT_HOST_PATH_START",
+  SELECT_HOST_PATH_COMPLETE: "SELECT_HOST_PATH_COMPLETE",
+  SELECT_HOST_PATH_ERROR: "SELECT_HOST_PATH_ERROR",
+} as const;
+export type HostMessageTypes = (typeof HostMessageTypes)[keyof typeof HostMessageTypes];
+
+export type Message = {
+  type: MessageTypes;
+  recipient: MessageRecipients;
+  data?: string;
+  requestId?: string;
+  toolUsage?: ToolUsageEntry[];
+  sessionId?: string | null;
+  url?: string;
+  userQuestion?: string; // Formatted user question for database storage
+};
+
+export interface RequestState {
+  requestId: string;
+  sessionId: string;
+  url: string;
+  text: string;
+  toolUsage: ToolUsageEntry[];
+}

@@ -1,0 +1,35 @@
+{
+  "manifest_version": 3,
+  "name": "AI Escalation Companion",
+  "version": "1.0",
+  "description": "Chrome extension to act as a bridge between escalations and AI agents",
+  "permissions": [
+    "tabs",
+    "nativeMessaging",
+    "sidePanel"
+  ],
+  "action": {
+    "default_title": "AI Escalation Companion"
+  },
+  "side_panel": {
+    "default_path": "dist/index.html"
+  },
+  "background": {
+    "service_worker": "dist/background.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "*://*.atlassian.net/*",
+        "*://*/jira/*",
+        "*://*/browse/*",
+        "*://github.com/*"
+      ],
+      "js": [
+        "dist/content.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ]
+}
